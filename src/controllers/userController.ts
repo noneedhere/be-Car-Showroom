@@ -117,10 +117,10 @@ export const updateUser = async (request: any, response: Response) => {
             /** update filename by new uploaded picture */
             filename = request.file.filename
             /** check the old picture in the folder */
-            let path = `${BASE_URL}/../public/profile_picture/${findUser.profilePicture}`
+            let path = `${BASE_URL}/../public/profilePicture/${findUser.profilePicture}`
             let exists = fs.existsSync(path)
             /** delete the old exists picture if reupload new file */
-            if(exists && findUser.profilePicture !== ``) fs.unlinkSync(path)
+            if (exists && findUser.profilePicture !== ``) fs.unlinkSync(path)
         }
 
         /** process to update user's data */
@@ -160,19 +160,19 @@ export const changePicture = async (request: any, response: Response) => {
         if (!findUser) return response
             .status(200)
             .json({ status: false, message: `User is not found` })
-        
+
         /** default value filename of saved data */
         let filename = findUser.profilePicture
-        if (request.file) {
+        if (request.file) { 
             /** update filename by new uploaded picture */
             filename = request.file.filename
             /** check the old picture in the folder */
-            let path = `${BASE_URL}/../public/profile_picture/${findUser.profilePicture}`
+            let path = `${BASE_URL}/../public/profilePicture/${findUser.profilePicture}`
             let exists = fs.existsSync(path)
             /** delete the old exists picture if reupload new file */
-            if(exists && findUser.profilePicture !== ``) fs.unlinkSync(path)
+            if (exists && findUser.profilePicture !== ``) fs.unlinkSync(path)
         }
-        
+
         /** process to update picture in database */
         const updatePicture = await prisma.user.update({
             data: { profilePicture: filename },
@@ -196,6 +196,15 @@ export const deleteUser = async (request: any, response: Response) => {
     try {
         /** get id of user's id that sent in parameter of URL */
         const { id } = request.params
+        const userId = Number(id);
+
+        if (!id || isNaN(userId)) {
+            return response.status(400).json({
+                status: false,
+                message: "Invalid or missing user ID in URL"
+            });
+        }
+
         /** make sure that data is exists in database */
         const findUser = await prisma.user.findFirst({ where: { id_user: Number(id) } })
         if (!findUser) return response
@@ -203,7 +212,7 @@ export const deleteUser = async (request: any, response: Response) => {
             .json({ status: false, message: `user is not found` })
 
         /** prepare to delete file of deleted user's data */
-        let path = `${BASE_URL}/public/profile_picture/${findUser.profilePicture}` /** define path (address) of file location */
+        let path = `${BASE_URL}/public/profilePicture/${findUser.profilePicture}` /** define path (address) of file location */
         let exists = fs.existsSync(path)
         if (exists && findUser.profilePicture !== ``) fs.unlinkSync(path) /** if file exist, then will be delete */
 

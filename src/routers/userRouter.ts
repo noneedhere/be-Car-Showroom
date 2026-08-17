@@ -12,11 +12,10 @@ app.use(express.json())
 
 app.get(`/getAll`, [verifyToken], getAllUsers)
 app.get('/getBy/:id', getUserById)
-app.post('/add', [uploadFile.single("picture"), verifyAddUser], createUser)
+app.post('/add', [uploadFile.single("picture")], createUser)
 app.put(`/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture"), verifyEditUser], updateUser)
 app.put(`/profile/:id`, [verifyToken, verifyRole(["CASHIER", "MANAGER"]), uploadFile.single("picture")], changePicture)
 app.delete(`/:id`, [verifyToken, verifyRole(["MANAGER"])], deleteUser)
 app.post(`/login`, [verifyAuthentication], authentication)
-// app.post('/login')
 
 export default app

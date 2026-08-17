@@ -78,7 +78,7 @@ export const createCar = async (request: any, response: Response) => {
 
         /** process to save new car */
         const newcar = await prisma.car.create({
-            data: { uuid, name, price: Number(price), category, year: Number(year), description, image: filename }
+            data: { uuid, name, price: Number(price), category, year: Number(year), description, carPicture: filename }
         })
 
         return response.json({
@@ -110,15 +110,15 @@ export const updateCar = async (request: any, response: Response) => {
             .json({ status: false, message: `car is not found` })
 
         /** default value filename of saved data */
-        let filename = findCar.image
+        let filename = findCar.carPicture
         if (request.file) {
             /** update filename by new uploaded picture */
             filename = request.file.filename
             /** check the old picture in the folder */
-            let path = `${BASE_URL}/../public/profile_picture/${findCar.image}`
+            let path = `${BASE_URL}/../public/profilePicture/${findCar.carPicture}`
             let exists = fs.existsSync(path)
             /** delete the old exists picture if reupload new file */
-            if(exists && findCar.image !== ``) fs.unlinkSync(path)
+            if(exists && findCar.carPicture !== ``) fs.unlinkSync(path)
         }
 
         /** process to update car's data */
@@ -129,7 +129,7 @@ export const updateCar = async (request: any, response: Response) => {
                 category: category || findCar.category,
                 year: year ? Number(year) : findCar.year,
                 description: description || findCar.description,
-                image: filename
+                carPicture: filename
             },
             where: { id_car: Number(id) }
         })
@@ -160,9 +160,9 @@ export const deleteCar = async (request: any, response: Response) => {
             .json({ status: false, message: `car is not found` })
 
         /** prepare to delete file of deleted car's data */
-        let path = `${BASE_URL}/public/profile_picture/${findCar.image}` /** define path (address) of file location */
+        let path = `${BASE_URL}${findCar.carPicture}` /** define path (address) of file location */
         let exists = fs.existsSync(path)
-        if (exists && findCar.image !== ``) fs.unlinkSync(path) /** if file exist, then will be delete */
+        if (exists && findCar.carPicture !== ``) fs.unlinkSync(path) /** if file exist, then will be delete */
 
         /** process to delete car's data */
         const deletedCar = await prisma.car.delete({

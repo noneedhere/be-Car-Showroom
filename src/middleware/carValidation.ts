@@ -7,6 +7,7 @@ const addDataSchema = Joi.object({
     price: Joi.number().min(0).required(),
     category: Joi.string().valid('FAMILY','SPORT').uppercase().required(),
     description: Joi.string().required(),
+    year: Joi.number().integer().min(1900).max(new Date().getFullYear()).required(),
     image: Joi.allow().optional(),
     user: Joi.optional()
 })
@@ -16,6 +17,7 @@ const editDataSchema = Joi.object({
     name: Joi.string().required(),
     price: Joi.number().min(0).optional(),
     category: Joi.string().valid('FAMILY','SPORT').uppercase().optional(),
+    year: Joi.number().integer().min(1900).max(new Date().getFullYear()).required(),
     description: Joi.string().optional(),
     image: Joi.allow().optional(),
     user: Joi.optional()

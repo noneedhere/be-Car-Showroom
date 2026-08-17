@@ -18,6 +18,7 @@ export const getAllSales = async (request: Request, response: Response) => {
             orderBy: { saleDate: "desc" },
             include: {
                 car: true,
+                OrderList: true,
                 user: true
             }
         })
@@ -37,17 +38,23 @@ export const getAllSales = async (request: Request, response: Response) => {
 
 export const createSale = async (request: Request, response: Response) => {
     try {
-        const { buyerName, carId } = request.body
-        const user = request.body.user
+        const { buyerName, id_car } = request.body
+
+        if (!buyerName || !id_car) {
+            return response.status(400).json({
+                status: false,
+                message: "buyerName and id_car are required"
+            })
+        }
 
         const findCar = await prisma.car.findUnique({
-            where: { id_car: Number(carId) }
+            where: { id_car: Number(id_car) }
         })
 
         if (!findCar) {
             return response.status(404).json({
                 status: false,
-                message: `Car with id ${carId} is not found`
+                message: `Car with ID ${id_car} not found`
             })
         }
 
@@ -55,8 +62,8 @@ export const createSale = async (request: Request, response: Response) => {
             data: {
                 uuid: uuidv4(),
                 buyerName,
-                carId: Number(carId),
-                userId: Number(user.id),
+                carId: Number(id_car),
+                userId: null // bisa null karena sudah diubah
             }
         })
 
@@ -76,8 +83,7 @@ export const createSale = async (request: Request, response: Response) => {
 export const updateSale = async (request: Request, response: Response) => {
     try {
         const { id } = request.params
-        const { buyerName, carId, price } = request.body
-        const user = request.body.user
+        const { buyerName, id_car } = request.body
 
         const findSale = await prisma.sale.findUnique({
             where: { id_sale: Number(id) }
@@ -94,8 +100,7 @@ export const updateSale = async (request: Request, response: Response) => {
             where: { id_sale: Number(id) },
             data: {
                 buyerName: buyerName || findSale.buyerName,
-                carId: carId ? Number(carId) : findSale.carId,
-                userId: user?.id || findSale.userId,
+                carId: id_car ? Number(id_car) : findSale.carId
             }
         })
 

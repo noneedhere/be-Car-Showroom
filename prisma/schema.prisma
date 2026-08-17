@@ -16,6 +16,7 @@ datasource db {
 enum Role {
   MANAGER
   SALES
+  CLIENT
 }
 
 enum Category {
@@ -30,7 +31,8 @@ model User {
   email          String   @unique
   password       String
   profilePicture String   @default("")
-  role           Role     @default(SALES)
+  role           Role     @default(CLIENT)
+  note           String?
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
   sales          Sale[]
@@ -43,7 +45,7 @@ model Car {
   category    Category   @default(FAMILY)
   year        Int
   price       Int
-  image       String?
+  carPicture  String
   description String?    @db.Text
   createdAt   DateTime   @default(now())
   updatedAt   DateTime   @updatedAt
@@ -52,18 +54,15 @@ model Car {
 }
 
 model Sale {
-  id_sale     Int        @id @default(autoincrement())
-  uuid        String     @unique @default(uuid())
-  buyerName   String
-  saleDate    DateTime   @default(now())
-  car         Car?       @relation(fields: [carId], references: [id_car])
-  carId       Int
-  user        User       @relation(fields: [userId], references: [id_user])
-  userId      Int
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
-  total_price Int        @default(0)
-  OrderList   SaleList[]
+  id_sale   Int        @id @default(autoincrement())
+  uuid      String     @unique
+  buyerName String
+  saleDate  DateTime   @default(now())
+  car       Car        @relation(fields: [carId], references: [id_car])
+  carId     Int
+  user      User?      @relation(fields: [userId], references: [id_user])
+  userId    Int? // <--- Bikin nullable di sini
+  OrderList SaleList[]
 }
 
 model SaleList {
